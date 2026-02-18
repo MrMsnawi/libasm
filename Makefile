@@ -1,30 +1,32 @@
-SRC = main.c
+NAME = libasm.a
 
-ASMS = ft_strlen.s
+SRC_ASM = ft_strlen.s ft_strcpy.s ft_strcmp.s ft_write.s ft_read.s ft_strdup.s
 
-CC = cc
+OBJ_ASM = $(SRC_ASM:.s=.o)
 
 NASM = nasm
+NASM_FLAGS = -f elf64
 
-LIB = libasm.a
-
-NAME = main
-
-OBJ = $(ASMS:.s=.o) main.o
+CC = cc
+CFLAGS = -Wall -Wextra -Werror
 
 all: $(NAME)
 
 %.o: %.s
-	$(NASM) -f elf64 $< -o $@
+	$(NASM) $(NASM_FLAGS) $< -o $@
 
-$(NAME): $(OBJ)
-	ar rcs $(LIB) $(OBJ)
-	$(CC) $(OBJ) $(LIB) -o $(NAME)
+$(NAME): $(OBJ_ASM)
+	ar rcs $(NAME) $(OBJ_ASM)
+
+main: $(NAME) main.c
+	$(CC) $(CFLAGS) main.c -L. -lasm -o main
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJ_ASM)
 
 fclean: clean
-	rm -f $(LIB) $(NAME)
+	rm -f $(NAME) main
 
-re : fclean all
+re: fclean all
+
+.PHONY: all clean fclean re
